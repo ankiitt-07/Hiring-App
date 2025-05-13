@@ -13,10 +13,10 @@ import org.springframework.stereotype.Component;
 @Mapper(componentModel = "spring")
 public interface CandidateMapper {
 
-//    @Mapping(target = "status", expression = "java(CandidateStatus.valueOf(dto.getStatus()))")
+    @Mapping(target = "status", expression = "java(CandidateStatus.valueOf(dto.getStatus()))")
     Candidate toEntity(CandidateDTO dto);
 
-//    @Mapping(source = "status", target = "status", qualifiedByName = "mapStatusToString")
+    @Mapping(source = "status", target = "status", qualifiedByName = "mapStatusToString")
     CandidateDTO toDto(Candidate candidate);
 
     @Named("mapStatusToEnum")

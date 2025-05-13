@@ -22,7 +22,6 @@ import java.util.List;
 
 @Service
 @Slf4j
-@EnableJpaAuditing
 public class DocumentService {
 
     @Autowired
@@ -86,19 +85,28 @@ public class DocumentService {
 
     private MediaType getMediaTypeForFileName(String fileName) {
         String extension = fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase();
-        return switch (extension) {
-            case "pdf" -> MediaType.APPLICATION_PDF;
-            case "png" -> MediaType.IMAGE_PNG;
-            case "jpg", "jpeg" -> MediaType.IMAGE_JPEG;
-            case "doc" -> MediaType.valueOf("application/msword");
-            case "docx" -> MediaType.valueOf("application/vnd.openxmlformats-officedocument.wordprocessingml.document");
-            case "xls" -> MediaType.valueOf("application/vnd.ms-excel");
-            case "xlsx" -> MediaType.valueOf("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-            case "txt" -> MediaType.TEXT_PLAIN;
-            default -> MediaType.APPLICATION_OCTET_STREAM;
-        };
+        switch (extension) {
+            case "pdf":
+                return MediaType.APPLICATION_PDF;
+            case "png":
+                return MediaType.IMAGE_PNG;
+            case "jpg":
+            case "jpeg":
+                return MediaType.IMAGE_JPEG;
+            case "doc":
+                return MediaType.valueOf("application/msword");
+            case "docx":
+                return MediaType.valueOf("application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+            case "xls":
+                return MediaType.valueOf("application/vnd.ms-excel");
+            case "xlsx":
+                return MediaType.valueOf("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            case "txt":
+                return MediaType.TEXT_PLAIN;
+            default:
+                return MediaType.APPLICATION_OCTET_STREAM;
+        }
     }
-
     public Boolean checkIfAnyDocumentExists(Long candidateId) {
         boolean exists = documentRepository.existsByCandidateId(candidateId);
         log.info("Document exists for candidate {}: {}", candidateId, exists);

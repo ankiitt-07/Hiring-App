@@ -9,10 +9,10 @@ import org.springframework.stereotype.Component;
 @Mapper(componentModel = "spring")
 public interface BankInfoMapper {
 
-//    @Mapping(source = "candidateId", target = "candidate.id")
+    @Mapping(source = "candidateId", target = "candidate.id")
     BankInfo toEntity(BankInfoDTO dto);
 
-//    @Mapping(source = "candidate.id", target = "candidateId")
+    @Mapping(source = "candidate.id", target = "candidateId")
     BankInfoDTO toDTO(BankInfo entity);
 }
 

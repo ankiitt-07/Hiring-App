@@ -2,6 +2,7 @@ package com.hiringapp.model.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,6 +12,7 @@ import java.time.LocalDate;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 //@Table(name = "personal_info")
 public class PersonalInfo {
     @Id
@@ -29,4 +31,7 @@ public class PersonalInfo {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String address;
 
+    @OneToOne
+    @JoinColumn(name = "candidate_id")
+    private Candidate candidate;
 }

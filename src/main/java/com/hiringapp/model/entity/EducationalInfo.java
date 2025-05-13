@@ -2,6 +2,7 @@ package com.hiringapp.model.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -9,10 +10,11 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class EducationInfo {
+@Builder
+public class EducationalInfo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @Column(nullable = false, length = 50)
     private String degreeName;
@@ -22,4 +24,8 @@ public class EducationInfo {
 
     @Column(nullable = false, length = 50)
     private int yearOfPassing;
+
+    @OneToOne
+    @JoinColumn(name = "candidate_id")
+    private Candidate candidate;
 }

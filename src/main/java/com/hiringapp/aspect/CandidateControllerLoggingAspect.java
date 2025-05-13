@@ -2,13 +2,14 @@ package com.hiringapp.aspect;
 
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
-import java.util.Arrays;
 
+@Slf4j
 @Aspect
 @Component
-@Slf4j
 public class CandidateControllerLoggingAspect {
 
     @Pointcut("within(com.hiringapp.controller.CandidateController)")
@@ -33,5 +34,27 @@ public class CandidateControllerLoggingAspect {
         log.error("Exception in method: {} with cause: {}",
                 joinPoint.getSignature().toShortString(),
                 ex.getMessage(), ex);
+    }
+
+    @Around("execution(* com.hiringapp.service.*.*(..))")
+    public Object logServiceMethods(final ProceedingJoinPoint joinPoint) throws Throwable {
+        MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
+
+        String className = methodSignature.getDeclaringType().getSimpleName();
+        String methodName = methodSignature.getName();
+
+        log.info("Executing {}.{} with arguments {}", className, methodName, joinPoint.getArgs());
+
+        long start = System.currentTimeMillis();
+        try {
+            Object result = joinPoint.proceed();
+            long duration = System.currentTimeMillis() - start;
+
+            log.info("{}.{} returned {} in {}ms", className, methodName, result, duration);
+            return result;
+        } catch (Throwable throwable) {
+            log.error("Exception in {}.{}: {}", className, methodName, throwable.getMessage(), throwable);
+            throw throwable;
+        }
     }
 }

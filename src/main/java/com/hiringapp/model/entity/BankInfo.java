@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import com.hiringapp.utils.dtos.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,7 +12,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "bank_info")
+@Builder
+//@Table(name = "bank_info")
 public class BankInfo {
 
     @Id
@@ -26,6 +28,10 @@ public class BankInfo {
 
     @Column(nullable = false, length = 50)
     private String accountNumber;
+
+    @OneToOne
+    @JoinColumn(name = "candidate_id")
+    private Candidate candidate;
 
 //
 //    @JsonBackReference
