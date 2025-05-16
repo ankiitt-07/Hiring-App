@@ -9,91 +9,76 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-
 import java.io.ByteArrayOutputStream;
 import java.util.List;
-import java.util.Optional;
-
-import static com.hiringapp.model.enums.CandidateStatus.OFFERED;
-import static com.hiringapp.model.enums.CandidateStatus.REJECTED;
 
 @Service
 @Slf4j
-@EnableJpaAuditing
 public class CandidateService {
 
-    @Autowired
-    private CandidateRepository candidateRepository;
+    private final CandidateRepository candidateRepository;
+    private final RabbitProducer rabbitProducer;
+    private final CandidateMapper candidateMapper;
 
-    @Autowired
-    private DocumentProducer documentProducer;
+    public CandidateService(CandidateRepository candidateRepository, RabbitProducer rabbitProducer, CandidateMapper candidateMapper) {
+        this.candidateRepository = candidateRepository;
+        this.rabbitProducer = rabbitProducer;
+        this.candidateMapper = candidateMapper;
+    }
 
-    @Autowired
-    private RabbitProducer rabbitProducer;
+    public List<Candidate> getAllCandidates() {
+        List<Candidate> candidates = candidateRepository.findAllCandidates();
 
-    @Autowired
-    private CandidateMapper candidateMapper;
-
-//    public List<Candidate> getAllCandidates() {
-//        return candidateRepository.findAllCandidates();
-//    }
-public List<Candidate> getAllCandidates() {
-    List<Candidate> candidates = candidateRepository.findAllCandidates();
-
-    for (Candidate candidate : candidates) {
-        if (candidate.getStatus() != null) {
-            switch (candidate.getStatus()) {
-                case "OFFERED":
-                case "REJECTED":
-                    log.info("Sending status mail for Candidate ID: {}", candidate.getId());
-                    rabbitProducer.sendCandidate(candidateMapper.toDto(candidate));
-                    break;
-                default:
-                    log.info("Skipping Candidate ID: {} with status: {}", candidate.getId(), candidate.getStatus());
+        for (Candidate candidate : candidates) {
+            if (candidate.getStatus() != null) {
+                switch (candidate.getStatus()) {
+                    case "OFFERED":
+                    case "REJECTED":
+                        log.info("Sending status mail for Candidate ID: {}", candidate.getId());
+                        rabbitProducer.sendCandidate(candidateMapper.toDto(candidate));
+                        break;
+                    default:
+                        log.info("Skipping Candidate ID: {} with status: {}", candidate.getId(), candidate.getStatus());
+                }
             }
         }
-    }
 
-    return candidates;
-}
+        return candidates;
+    }
 
     public Candidate getCandidatesById(Long id) {
-        return candidateRepository.findById(id).orElseThrow(() -> new CandidateNotFoundException(id));
-
+        return candidateRepository.findById(id)
+                .orElseThrow(() -> new CandidateNotFoundException(id));
     }
 
-
-    public Candidate addCandidate(Candidate candidate) throws  Exception {
-        if(candidateRepository.existsById((long) candidate.getId())){
+    public Candidate addCandidate(Candidate candidate) throws Exception {
+        if(candidate.getId() != 0 && candidateRepository.existsById((long) candidate.getId())){
             throw new Exception("Candidate already exists");
         }
         Candidate saved = candidateRepository.save(candidate);
-
-        //Notify Document Queue
         log.info("Saved Candidate ID: {}", saved.getId());
         return saved;
     }
 
     public Candidate updateCandidate(Long id, Candidate candidate) {
-        Optional<Candidate> existingCandidate = candidateRepository.findById(id);
-        if (existingCandidate.isPresent()) {
-            Candidate updatedCandidate = existingCandidate.get();
-            updatedCandidate.setFullName(candidate.getFullName());
-            updatedCandidate.setEmail(candidate.getEmail());
-            updatedCandidate.setPhoneNumber(candidate.getPhoneNumber());
-            return candidateRepository.save(updatedCandidate);
-        }
-        return null;
+        Candidate existingCandidate = candidateRepository.findById(id)
+                .orElseThrow(() -> new CandidateNotFoundException(id));
+
+        existingCandidate.setFullName(candidate.getFullName());
+        existingCandidate.setEmail(candidate.getEmail());
+        existingCandidate.setPhoneNumber(candidate.getPhoneNumber());
+        existingCandidate.setStatus(candidate.getStatus());
+
+        return candidateRepository.save(existingCandidate);
     }
+
     public void deleteCandidate(Long id) throws Exception {
         if(!candidateRepository.existsById(id)) {
             throw new Exception("Candidate not found");
@@ -104,6 +89,7 @@ public List<Candidate> getAllCandidates() {
     public long countCandidates() {
         return candidateRepository.count();
     }
+
     public ResponseEntity<Resource> generateCandidateReport() {
         List<Candidate> candidates = candidateRepository.findAll();
 
@@ -124,7 +110,7 @@ public List<Candidate> getAllCandidates() {
                 row.createCell(1).setCellValue(candidate.getFullName());
                 row.createCell(2).setCellValue(candidate.getEmail());
                 row.createCell(3).setCellValue(candidate.getPhoneNumber());
-                row.createCell(4).setCellValue(candidate.getStatus() != null ? candidate.getStatus().toString() : "N/A");
+                row.createCell(4).setCellValue(candidate.getStatus() != null ? candidate.getStatus() : "N/A");
             }
 
             ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -143,4 +129,3 @@ public List<Candidate> getAllCandidates() {
         }
     }
 }
-

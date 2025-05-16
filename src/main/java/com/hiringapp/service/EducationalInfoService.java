@@ -16,24 +16,21 @@ public class EducationalInfoService {
     private final CandidateRepository candidateRepository;
     private final EducationalInfoMapper mapper;
 
-    public EducationalInfoService(
-            EducationalInfoRepository repository,
-            CandidateRepository candidateRepository,
-            EducationalInfoMapper mapper) {
+    public EducationalInfoService(EducationalInfoRepository repository, CandidateRepository candidateRepository, EducationalInfoMapper mapper) {
         this.repository = repository;
         this.candidateRepository = candidateRepository;
         this.mapper = mapper;
     }
 
-    public EducationalInfoDTO saveEducationalInfo(EducationalInfo entity) {
-        Candidate candidate = candidateRepository.findById(entity.getCandidate())
+    public EducationalInfoDTO saveEducationalInfo(EducationalInfoDTO dto) {
+        Candidate candidate = candidateRepository.findById(dto.getCandidateId())
                 .orElseThrow(() -> new ResourceNotFoundException("Candidate not found"));
 
-        entity.setCandidate(candidate); // associate the candidate with the education info
-        EducationalInfo savedEntity = repository.save(entity); // save the entity
-        return mapper.toDto(savedEntity); // convert back to DTO and return
+        EducationalInfo entity = mapper.toEntity(dto);
+        entity.setCandidate(candidate); // Set the candidate reference
+        EducationalInfo savedEntity = repository.save(entity);
+        return mapper.toDto(savedEntity);
     }
-
 
     public EducationalInfoDTO getById(Long id) {
         EducationalInfo info = repository.findById(id)

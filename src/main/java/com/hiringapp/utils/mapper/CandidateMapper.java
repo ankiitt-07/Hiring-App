@@ -7,16 +7,15 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
-import org.springframework.stereotype.Component;
 
 @EnableJpaAuditing
 @Mapper(componentModel = "spring")
 public interface CandidateMapper {
 
-    @Mapping(target = "status", expression = "java(CandidateStatus.valueOf(dto.getStatus()))")
+//    @Mapping(target = "status", expression = "java(CandidateStatus.valueOf(dto.getStatus()))")
     Candidate toEntity(CandidateDTO dto);
 
-    @Mapping(source = "status", target = "status", qualifiedByName = "mapStatusToString")
+//    @Mapping(source = "status", target = "status", qualifiedByName = "mapStatusToString")
     CandidateDTO toDto(Candidate candidate);
 
     @Named("mapStatusToEnum")

@@ -13,7 +13,7 @@ import java.util.Map;
 
 @Component
 @Slf4j
-public class RabbitConsumer {
+public class RabbitMessageConsumer {
 
     @Autowired
     private EmailService emailService;

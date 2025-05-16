@@ -1,5 +1,6 @@
 package com.hiringapp.service;
 
+import com.hiringapp.exceptions.ResourceNotFoundException;
 import com.hiringapp.model.entity.Candidate;
 import com.hiringapp.model.entity.Document;
 import com.hiringapp.repository.CandidateRepository;
@@ -8,7 +9,6 @@ import com.hiringapp.utils.dtos.DocumentDTO;
 import com.hiringapp.utils.mapper.DocumentMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -24,23 +24,31 @@ import java.util.List;
 @Slf4j
 public class DocumentService {
 
-    @Autowired
-    private DocumentRepository documentRepository;
+    private final DocumentRepository documentRepository;
+    private final CandidateRepository candidateRepository;
+    private final DocumentMapper documentMapper;
 
     @Autowired
-    private CandidateRepository candidateRepository;
+    public DocumentService(DocumentRepository documentRepository,
+                           CandidateRepository candidateRepository,
+                           DocumentMapper documentMapper) {
+        this.documentRepository = documentRepository;
+        this.candidateRepository = candidateRepository;
+        this.documentMapper = documentMapper;
+    }
 
     public List<DocumentDTO> uploadMultipleDocuments(String documentType, Long candidateId, List<MultipartFile> files) throws IOException {
         Candidate candidate = candidateRepository.findById(candidateId)
-                .orElseThrow(() -> new RuntimeException("Candidate not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Candidate not found"));
 
         List<DocumentDTO> documentDTOs = new ArrayList<>();
 
         for (MultipartFile file : files) {
-            // Check if an empty document row exists
+            // Check if an empty document row exists for this candidate
             Document existingEmptyDoc = documentRepository
                     .findFirstByCandidateIdAndFileDataIsNull(candidateId)
                     .orElse(null);
+
             Document documentToSave;
 
             if (existingEmptyDoc != null) {
@@ -62,16 +70,15 @@ public class DocumentService {
             }
 
             Document saved = documentRepository.save(documentToSave);
-            documentDTOs.add(DocumentMapper.toDTO(saved));
+            documentDTOs.add(documentMapper.toDTO(saved));
         }
 
         return documentDTOs;
     }
 
-
     public ResponseEntity<byte[]> downloadDocument(Long id) {
         Document document = documentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Document not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Document not found"));
 
         String fileName = document.getFileName();
 
@@ -84,29 +91,26 @@ public class DocumentService {
     }
 
     private MediaType getMediaTypeForFileName(String fileName) {
+        if (fileName == null || !fileName.contains(".")) {
+            return MediaType.APPLICATION_OCTET_STREAM;
+        }
+
         String extension = fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase();
+
         switch (extension) {
-            case "pdf":
-                return MediaType.APPLICATION_PDF;
-            case "png":
-                return MediaType.IMAGE_PNG;
+            case "pdf": return MediaType.APPLICATION_PDF;
+            case "png": return MediaType.IMAGE_PNG;
             case "jpg":
-            case "jpeg":
-                return MediaType.IMAGE_JPEG;
-            case "doc":
-                return MediaType.valueOf("application/msword");
-            case "docx":
-                return MediaType.valueOf("application/vnd.openxmlformats-officedocument.wordprocessingml.document");
-            case "xls":
-                return MediaType.valueOf("application/vnd.ms-excel");
-            case "xlsx":
-                return MediaType.valueOf("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-            case "txt":
-                return MediaType.TEXT_PLAIN;
-            default:
-                return MediaType.APPLICATION_OCTET_STREAM;
+            case "jpeg": return MediaType.IMAGE_JPEG;
+            case "doc": return MediaType.valueOf("application/msword");
+            case "docx": return MediaType.valueOf("application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+            case "xls": return MediaType.valueOf("application/vnd.ms-excel");
+            case "xlsx": return MediaType.valueOf("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            case "txt": return MediaType.TEXT_PLAIN;
+            default: return MediaType.APPLICATION_OCTET_STREAM;
         }
     }
+
     public Boolean checkIfAnyDocumentExists(Long candidateId) {
         boolean exists = documentRepository.existsByCandidateId(candidateId);
         log.info("Document exists for candidate {}: {}", candidateId, exists);

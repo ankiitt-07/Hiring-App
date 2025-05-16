@@ -12,12 +12,12 @@ import java.time.LocalDate;
 
 @Service
 @Slf4j
-public class DocumentConsumer {
+public class DocumentListener {
 
     private final CandidateRepository candidateRepository;
     private final DocumentRepository documentRepository;
 
-    public DocumentConsumer(CandidateRepository candidateRepository, DocumentRepository documentRepository) {
+    public DocumentListener(CandidateRepository candidateRepository, DocumentRepository documentRepository) {
         this.candidateRepository = candidateRepository;
         this.documentRepository = documentRepository;
     }

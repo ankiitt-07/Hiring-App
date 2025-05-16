@@ -33,9 +33,4 @@ public class BankInfo {
     @JoinColumn(name = "candidate_id")
     private Candidate candidate;
 
-//
-//    @JsonBackReference
-//    @OneToOne(mappedBy = "bankInfo") // foreign key
-//    private Candidate candidate;
-
 }

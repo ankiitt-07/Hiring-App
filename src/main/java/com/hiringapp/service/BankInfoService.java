@@ -1,6 +1,5 @@
 package com.hiringapp.service;
 
-import com.hiringapp.exceptions.CandidateNotFoundException;
 import com.hiringapp.exceptions.ResourceNotFoundException;
 import com.hiringapp.model.entity.BankInfo;
 import com.hiringapp.model.entity.Candidate;
@@ -10,9 +9,6 @@ import com.hiringapp.utils.dtos.BankInfoDTO;
 import com.hiringapp.utils.mapper.BankInfoMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class BankInfoService {
@@ -27,12 +23,13 @@ public class BankInfoService {
     private BankInfoMapper bankInfoMapper;
 
     public BankInfoDTO saveBankInfo(BankInfoDTO dto) {
-        Candidate candidate = candidateRepository.findById((long) dto.getId())
+        Candidate candidate = candidateRepository.findById(dto.getCandidateId())
                 .orElseThrow(() -> new ResourceNotFoundException("Candidate not found"));
 
         BankInfo bank = bankInfoMapper.toEntity(dto);
-        bank.setBankName(dto.getBankName());
-        return bankInfoMapper.toDTO(bankInfoRepository.save(bank));
+        bank.setCandidate(candidate);
+        BankInfo saved = bankInfoRepository.save(bank);
+        return bankInfoMapper.toDTO(saved);
     }
 
     public BankInfoDTO getBankInfoById(Long id) {

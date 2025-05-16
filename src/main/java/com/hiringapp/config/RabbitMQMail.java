@@ -61,6 +61,24 @@ public class RabbitMQMail {
     }
 
     @Bean
+    public Queue otpQueue() {
+        return new Queue("hiringAuthOtpQueue", true);
+    }
+
+    @Bean
+    public TopicExchange otpExchange() {
+        return new TopicExchange("hiringAuthOtpTopicExchange");
+    }
+
+    @Bean
+    public Binding otpBinding() {
+        return BindingBuilder
+                .bind(otpQueue())
+                .to(otpExchange())
+                .with("auth.*");
+    }
+
+    @Bean
     public AmqpTemplate amqpTemplate(org.springframework.amqp.rabbit.connection.ConnectionFactory connectionFactory) {
         RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
         rabbitTemplate.setMessageConverter(jsonMessageConverter());

@@ -5,6 +5,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -26,5 +27,8 @@ public class BankInfoDTO {
 
     @NotBlank(message = "Account number is required")
     private String accountNumber;
+
+    @NotNull(message = "Candidate Id" )
+    private Long candidateId;
 
 }

@@ -16,6 +16,7 @@ public interface BankInfoMapper {
     BankInfoDTO toDTO(BankInfo entity);
 }
 
+
 //@Component
 //public class BankInfoMapper {
 //

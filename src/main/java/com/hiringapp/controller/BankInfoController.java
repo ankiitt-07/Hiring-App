@@ -1,29 +1,33 @@
 package com.hiringapp.controller;
 
-import com.hiringapp.model.entity.BankInfo;
-import com.hiringapp.service.BankInfoService;
 import com.hiringapp.utils.dtos.BankInfoDTO;
+import com.hiringapp.service.BankInfoService;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/candidates")
+@RequestMapping("/api/bank-info")
 @Slf4j
 public class BankInfoController {
 
-    @Autowired
-    private BankInfoService bankInfoService;
+    private final BankInfoService bankInfoService;
 
-    @PostMapping("/upload-bank_info")
-    public ResponseEntity<BankInfoDTO> uploadBankInfo(@RequestBody final BankInfoDTO bankInfoDTO) {
-        return new ResponseEntity<>(bankInfoService.saveBankInfo(bankInfoDTO), HttpStatus.CREATED);
+    public BankInfoController(BankInfoService bankInfoService) {
+        this.bankInfoService = bankInfoService;
+    }
+
+    @PostMapping
+    public ResponseEntity<BankInfoDTO> createBankInfo(@RequestBody @Valid BankInfoDTO bankInfoDTO) {
+        BankInfoDTO saved = bankInfoService.saveBankInfo(bankInfoDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<BankInfoDTO> getBankInfo(@PathVariable Long id) {
-        return new ResponseEntity<>(bankInfoService.getBankInfoById(id), HttpStatus.OK);
+        BankInfoDTO bankInfo = bankInfoService.getBankInfoById(id);
+        return ResponseEntity.ok(bankInfo);
     }
 }

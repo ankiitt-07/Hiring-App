@@ -1,5 +1,6 @@
 package com.hiringapp.controller;
 
+import com.hiringapp.model.entity.EducationalInfo;
 import com.hiringapp.service.EducationalInfoService;
 import com.hiringapp.utils.dtos.EducationalInfoDTO;
 import jakarta.validation.Valid;

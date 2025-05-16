@@ -13,6 +13,4 @@ public interface EducationalInfoMapper {
 
     @Mapping(source = "candidate.id", target = "candidateId")
     EducationalInfoDTO toDto(EducationalInfo entity);
-
-
 }

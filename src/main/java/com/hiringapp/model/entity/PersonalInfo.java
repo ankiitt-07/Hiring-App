@@ -13,14 +13,11 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-//@Table(name = "personal_info")
 public class PersonalInfo {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-
-//    @OneToOne(mappedBy = )
-//    private Candidate candidate;
 
     @Column(nullable = false)
     private LocalDate dob;

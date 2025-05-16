@@ -22,7 +22,7 @@ public class EducationalInfo {
     @Column(nullable = false, length = 50)
     private String institutionName;
 
-    @Column(nullable = false, length = 50)
+    @Column(nullable = false)
     private int yearOfPassing;
 
     @OneToOne

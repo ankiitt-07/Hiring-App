@@ -1,6 +1,5 @@
 package com.hiringapp.model.entity;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.PastOrPresent;
 import lombok.AllArgsConstructor;
@@ -11,6 +10,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Data
@@ -41,9 +41,18 @@ public class Candidate {
     public void prePersist() {
         this.sentAt = LocalDateTime.now();
     }
-//
-//    @JsonManagedReference
-//    @OneToOne(cascade = CascadeType.ALL)
-//    @JoinColumn(name = "bankInfoId")
-//    private BankInfo bankInfo;
+
+    @OneToOne(mappedBy = "candidate", cascade = CascadeType.ALL, orphanRemoval = true)
+    private PersonalInfo personalInfo;
+
+    @OneToOne(mappedBy = "candidate", cascade = CascadeType.ALL, orphanRemoval = true)
+    private EducationalInfo educationalInfo;
+
+    @OneToOne(mappedBy = "candidate", cascade = CascadeType.ALL, orphanRemoval = true)
+    private BankInfo bankInfo;
+
+    @OneToMany(mappedBy = "candidate", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Document> documents;
+
+
 }
