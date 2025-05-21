@@ -14,7 +14,7 @@ public class PersonalInfoDTO {
     private long id;
 
     @NotBlank(message = "DOB is required")
-    private String dob; // As String in ISO format, e.g., "YYYY-MM-DD"
+    private String dob;
 
     @NotBlank(message = "Gender is required")
     @Pattern(regexp = "^(?i)(male|female|other|prefer not to say)$", message = "Gender must be male, female, other, or prefer not to say")

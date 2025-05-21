@@ -8,11 +8,11 @@
 <div style="max-width: 600px; background-color: #ffffff; padding: 30px; margin: auto; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
     <h2 style="color: #333333;">Hello, <span th:text="${name}">Candidate</span> 👋</h2>
 
-    <p th:if="${status == 'offered'}" style="font-size: 16px; color: #28a745;">
+    <p th:if="${status == 'OFFERED'}" style="font-size: 16px; color: #28a745;">
         🎉 Congratulations! You have received an <strong>offer</strong> from our company. We're excited to have you on board!
     </p>
 
-    <p th:if="${status == 'rejected'}" style="font-size: 16px; color: #dc3545;">
+    <p th:if="${status == 'REJECTED'}" style="font-size: 16px; color: #dc3545;">
         😞 We regret to inform you that you have not been selected at this time. We truly appreciate the effort and interest you showed.
     </p>
 

@@ -1,7 +1,11 @@
 package com.hiringapp.model.entity;
 
+import com.hiringapp.model.enums.CandidateStatus;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,6 +13,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -17,17 +22,28 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-public class Candidate {
+public class Candidate implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private long id;
 
+    @NotBlank(message = "Full name is required")
+    @Pattern(regexp = "^[A-Z][a-z]+\\s[A-Z][a-z]+$", message = "Full Name must start with a capital letter and have a space between first and last name")
     private String fullName;
-    private String email;
-    private String phoneNumber;
-    private String status;
 
-    @PastOrPresent(message = "Sent time can not be in the future")
+    @NotBlank(message = "Email is required")
+    @Email(message = "Email should be valid")
+    private String email;
+
+    @NotBlank(message = "Phone number is required")
+    @Pattern(regexp = "^[6-9][0-9]{9}$", message = "Phone number must be exactly 10 digits starting with 6-9")
+    private String phoneNumber;
+
+    @Enumerated(EnumType.STRING)
+//    @NotNull(message = "Candidate status cannot be empty")
+    private CandidateStatus status;
+
+    @PastOrPresent(message = "Sent time cannot be in the future")
     private LocalDateTime sentAt;
 
     @CreatedDate
@@ -41,18 +57,4 @@ public class Candidate {
     public void prePersist() {
         this.sentAt = LocalDateTime.now();
     }
-
-    @OneToOne(mappedBy = "candidate", cascade = CascadeType.ALL, orphanRemoval = true)
-    private PersonalInfo personalInfo;
-
-    @OneToOne(mappedBy = "candidate", cascade = CascadeType.ALL, orphanRemoval = true)
-    private EducationalInfo educationalInfo;
-
-    @OneToOne(mappedBy = "candidate", cascade = CascadeType.ALL, orphanRemoval = true)
-    private BankInfo bankInfo;
-
-    @OneToMany(mappedBy = "candidate", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Document> documents;
-
-
 }

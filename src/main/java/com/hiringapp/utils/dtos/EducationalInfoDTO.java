@@ -1,7 +1,6 @@
 package com.hiringapp.utils.dtos;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,17 +9,23 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EducationalInfoDTO {
-    private Long id;
 
-    @NotBlank(message = "Degree name cannot be empty")
-    private String degreeName;
+    @NotBlank(message = "Degree is required")
+    private String degree;
 
-    @NotBlank(message = "Institution name cannot be empty")
-    private String institutionName;
+    @NotBlank(message = "University name is required")
+    private String university;
 
-    @NotBlank(message = "Year of passing cannot be empty")
-    @Pattern(regexp = "^(19[5-9][0-9]|20[0-9][0-9])$", message = "Year must be a valid year")
-    private int yearOfPassing;
+    @NotNull(message = "Passing year is required")
+    @Min(value = 1950, message = "Year must be after 1950")
+    @Max(value = 2100, message = "Year must be before 2100")
+    private Integer passingYear;
 
+    @NotNull(message = "Percentage is required")
+    @DecimalMin(value = "0.0", message = "Percentage must be >= 0")
+    @DecimalMax(value = "100.0", message = "Percentage must be <= 100")
+    private Double percentage;
+
+    @NotNull(message = "Candidate ID is required")
     private Long candidateId;
 }

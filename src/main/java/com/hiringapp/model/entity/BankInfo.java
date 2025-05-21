@@ -20,14 +20,11 @@ public class BankInfo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 50)
-    private String bankName;
-
-    @Column(nullable = false, length = 50)
-    private String ifscCode;
-
-    @Column(nullable = false, length = 50)
+    private String accountHolderName;
     private String accountNumber;
+    private String ifscCode;
+    private String bankName;
+    private String branchName;
 
     @OneToOne
     @JoinColumn(name = "candidate_id")

@@ -7,29 +7,30 @@ import com.hiringapp.repository.BankInfoRepository;
 import com.hiringapp.repository.CandidateRepository;
 import com.hiringapp.utils.dtos.BankInfoDTO;
 import com.hiringapp.utils.mapper.BankInfoMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class BankInfoService {
 
-    @Autowired
-    private BankInfoRepository bankInfoRepository;
+    private final BankInfoRepository bankInfoRepository;
+    private final CandidateRepository candidateRepository;
+    private final BankInfoMapper bankInfoMapper;
 
-    @Autowired
-    private CandidateRepository candidateRepository;
-
-    @Autowired
-    private BankInfoMapper bankInfoMapper;
+    public BankInfoService(BankInfoRepository bankInfoRepository,
+                           CandidateRepository candidateRepository,
+                           BankInfoMapper bankInfoMapper) {
+        this.bankInfoRepository = bankInfoRepository;
+        this.candidateRepository = candidateRepository;
+        this.bankInfoMapper = bankInfoMapper;
+    }
 
     public BankInfoDTO saveBankInfo(BankInfoDTO dto) {
         Candidate candidate = candidateRepository.findById(dto.getCandidateId())
                 .orElseThrow(() -> new ResourceNotFoundException("Candidate not found"));
 
-        BankInfo bank = bankInfoMapper.toEntity(dto);
-        bank.setCandidate(candidate);
-        BankInfo saved = bankInfoRepository.save(bank);
-        return bankInfoMapper.toDTO(saved);
+        BankInfo bankInfo = bankInfoMapper.toEntity(dto);
+        bankInfo.setCandidate(candidate);
+        return bankInfoMapper.toDTO(bankInfoRepository.save(bankInfo));
     }
 
     public BankInfoDTO getBankInfoById(Long id) {

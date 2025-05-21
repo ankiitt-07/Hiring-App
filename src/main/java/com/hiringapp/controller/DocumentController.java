@@ -25,7 +25,7 @@ public class DocumentController {
     @Autowired
     private DocumentRepository documentRepository;
 
-    @PostMapping("/upload")
+    @PostMapping("/upload-multiple")
     public ResponseEntity<?> uploadMultipleDocuments(
             @RequestParam("documentType") String documentType,
             @RequestParam("candidateId") Long candidateId,
@@ -44,10 +44,8 @@ public class DocumentController {
         return documentService.downloadDocument(id);
     }
 
-
     @GetMapping("/check/{candidateId}")
     public ResponseEntity<Boolean> checkDocument(@PathVariable Long candidateId) {
         return new ResponseEntity<>(documentService.checkIfAnyDocumentExists(candidateId), HttpStatus.OK);
     }
-
 }

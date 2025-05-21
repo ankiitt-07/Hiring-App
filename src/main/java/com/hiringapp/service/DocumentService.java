@@ -23,32 +23,23 @@ import java.util.List;
 @Service
 @Slf4j
 public class DocumentService {
-
-    private final DocumentRepository documentRepository;
-    private final CandidateRepository candidateRepository;
-    private final DocumentMapper documentMapper;
+    @Autowired
+    private DocumentRepository documentRepository;
 
     @Autowired
-    public DocumentService(DocumentRepository documentRepository,
-                           CandidateRepository candidateRepository,
-                           DocumentMapper documentMapper) {
-        this.documentRepository = documentRepository;
-        this.candidateRepository = candidateRepository;
-        this.documentMapper = documentMapper;
-    }
+    private CandidateRepository candidateRepository;
 
     public List<DocumentDTO> uploadMultipleDocuments(String documentType, Long candidateId, List<MultipartFile> files) throws IOException {
         Candidate candidate = candidateRepository.findById(candidateId)
-                .orElseThrow(() -> new ResourceNotFoundException("Candidate not found"));
+                .orElseThrow(() -> new RuntimeException("Candidate not found"));
 
         List<DocumentDTO> documentDTOs = new ArrayList<>();
 
         for (MultipartFile file : files) {
-            // Check if an empty document row exists for this candidate
+            // Check if an empty document row exists
             Document existingEmptyDoc = documentRepository
                     .findFirstByCandidateIdAndFileDataIsNull(candidateId)
                     .orElse(null);
-
             Document documentToSave;
 
             if (existingEmptyDoc != null) {
@@ -70,15 +61,16 @@ public class DocumentService {
             }
 
             Document saved = documentRepository.save(documentToSave);
-            documentDTOs.add(documentMapper.toDTO(saved));
+            documentDTOs.add(DocumentMapper.toDTO(saved));
         }
 
         return documentDTOs;
     }
 
+
     public ResponseEntity<byte[]> downloadDocument(Long id) {
         Document document = documentRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Document not found"));
+                .orElseThrow(() -> new RuntimeException("Document not found"));
 
         String fileName = document.getFileName();
 
@@ -91,26 +83,29 @@ public class DocumentService {
     }
 
     private MediaType getMediaTypeForFileName(String fileName) {
-        if (fileName == null || !fileName.contains(".")) {
-            return MediaType.APPLICATION_OCTET_STREAM;
-        }
-
         String extension = fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase();
-
         switch (extension) {
-            case "pdf": return MediaType.APPLICATION_PDF;
-            case "png": return MediaType.IMAGE_PNG;
+            case "pdf":
+                return MediaType.APPLICATION_PDF;
+            case "png":
+                return MediaType.IMAGE_PNG;
             case "jpg":
-            case "jpeg": return MediaType.IMAGE_JPEG;
-            case "doc": return MediaType.valueOf("application/msword");
-            case "docx": return MediaType.valueOf("application/vnd.openxmlformats-officedocument.wordprocessingml.document");
-            case "xls": return MediaType.valueOf("application/vnd.ms-excel");
-            case "xlsx": return MediaType.valueOf("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-            case "txt": return MediaType.TEXT_PLAIN;
-            default: return MediaType.APPLICATION_OCTET_STREAM;
+            case "jpeg":
+                return MediaType.IMAGE_JPEG;
+            case "doc":
+                return MediaType.valueOf("application/msword");
+            case "docx":
+                return MediaType.valueOf("application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+            case "xls":
+                return MediaType.valueOf("application/vnd.ms-excel");
+            case "xlsx":
+                return MediaType.valueOf("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            case "txt":
+                return MediaType.TEXT_PLAIN;
+            default:
+                return MediaType.APPLICATION_OCTET_STREAM;
         }
     }
-
     public Boolean checkIfAnyDocumentExists(Long candidateId) {
         boolean exists = documentRepository.existsByCandidateId(candidateId);
         log.info("Document exists for candidate {}: {}", candidateId, exists);

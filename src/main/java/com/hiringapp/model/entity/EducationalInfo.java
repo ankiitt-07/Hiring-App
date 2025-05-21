@@ -16,14 +16,10 @@ public class EducationalInfo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 50)
-    private String degreeName;
-
-    @Column(nullable = false, length = 50)
-    private String institutionName;
-
-    @Column(nullable = false)
-    private int yearOfPassing;
+    private String degree;
+    private String university;
+    private Integer passingYear;
+    private Double percentage;
 
     @OneToOne
     @JoinColumn(name = "candidate_id")

@@ -1,7 +1,10 @@
 package com.hiringapp.service;
 
 import com.hiringapp.exceptions.CandidateNotFoundException;
+import com.hiringapp.exceptions.InvalidStatusTransitionException;
+import com.hiringapp.exceptions.ResourceNotFoundException;
 import com.hiringapp.model.entity.Candidate;
+import com.hiringapp.model.enums.CandidateStatus;
 import com.hiringapp.repository.CandidateRepository;
 import com.hiringapp.utils.mapper.CandidateMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +12,10 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -18,20 +25,24 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
 public class CandidateService {
 
-    private final CandidateRepository candidateRepository;
-    private final RabbitProducer rabbitProducer;
-    private final CandidateMapper candidateMapper;
 
-    public CandidateService(CandidateRepository candidateRepository, RabbitProducer rabbitProducer, CandidateMapper candidateMapper) {
-        this.candidateRepository = candidateRepository;
-        this.rabbitProducer = rabbitProducer;
-        this.candidateMapper = candidateMapper;
-    }
+    @Autowired
+    private CandidateRepository candidateRepository;
+
+    @Autowired
+    private DocumentProducer documentProducer;
+
+    @Autowired
+    private RabbitProducer rabbitProducer;
+
+    @Autowired
+    private CandidateMapper candidateMapper;
 
     public List<Candidate> getAllCandidates() {
         List<Candidate> candidates = candidateRepository.findAllCandidates();
@@ -39,8 +50,8 @@ public class CandidateService {
         for (Candidate candidate : candidates) {
             if (candidate.getStatus() != null) {
                 switch (candidate.getStatus()) {
-                    case "OFFERED":
-                    case "REJECTED":
+                    case OFFERED:
+                    case REJECTED:
                         log.info("Sending status mail for Candidate ID: {}", candidate.getId());
                         rabbitProducer.sendCandidate(candidateMapper.toDto(candidate));
                         break;
@@ -53,34 +64,55 @@ public class CandidateService {
         return candidates;
     }
 
+    @Cacheable(value = "candidates", key = "#id")
     public Candidate getCandidatesById(Long id) {
         return candidateRepository.findById(id)
                 .orElseThrow(() -> new CandidateNotFoundException(id));
     }
 
+    @CachePut(value = "candidates", key = "#result.id")
     public Candidate addCandidate(Candidate candidate) throws Exception {
-        if(candidate.getId() != 0 && candidateRepository.existsById((long) candidate.getId())){
+        if (candidateRepository.existsById(candidate.getId())) {
             throw new Exception("Candidate already exists");
         }
+
+        candidate.setStatus(CandidateStatus.APPLIED);
         Candidate saved = candidateRepository.save(candidate);
-        log.info("Saved Candidate ID: {}", saved.getId());
+
+        log.info("Candidate saved with ID: {}", saved.getId());
+        documentProducer.sendCandidateId(saved.getId());
+
         return saved;
     }
 
+    @CachePut(value = "candidates", key = "#id")
     public Candidate updateCandidate(Long id, Candidate candidate) {
-        Candidate existingCandidate = candidateRepository.findById(id)
-                .orElseThrow(() -> new CandidateNotFoundException(id));
+        Optional<Candidate> existingCandidateOptional = candidateRepository.findById(id);
+        if (existingCandidateOptional.isPresent()) {
+            Candidate existingCandidate = existingCandidateOptional.get();
 
-        existingCandidate.setFullName(candidate.getFullName());
-        existingCandidate.setEmail(candidate.getEmail());
-        existingCandidate.setPhoneNumber(candidate.getPhoneNumber());
-        existingCandidate.setStatus(candidate.getStatus());
+            existingCandidate.setFullName(candidate.getFullName());
+            existingCandidate.setEmail(candidate.getEmail());
+            existingCandidate.setPhoneNumber(candidate.getPhoneNumber());
 
-        return candidateRepository.save(existingCandidate);
+            CandidateStatus currentStatus = existingCandidate.getStatus();
+            CandidateStatus newStatus = candidate.getStatus();
+
+            if (newStatus != null && currentStatus != newStatus) {
+                if (!currentStatus.canTransitionTo(newStatus)) {
+                    throw new InvalidStatusTransitionException("Invalid status transition from " + currentStatus + " to " + newStatus);
+                }
+                existingCandidate.setStatus(newStatus);
+            }
+
+            return candidateRepository.save(existingCandidate);
+        }
+        throw new ResourceNotFoundException("Candidate not found with ID: " + id);
     }
 
+    @CacheEvict(value = "candidates", key = "#id")
     public void deleteCandidate(Long id) throws Exception {
-        if(!candidateRepository.existsById(id)) {
+        if (!candidateRepository.existsById(id)) {
             throw new Exception("Candidate not found");
         }
         candidateRepository.deleteById(id);
@@ -110,7 +142,7 @@ public class CandidateService {
                 row.createCell(1).setCellValue(candidate.getFullName());
                 row.createCell(2).setCellValue(candidate.getEmail());
                 row.createCell(3).setCellValue(candidate.getPhoneNumber());
-                row.createCell(4).setCellValue(candidate.getStatus() != null ? candidate.getStatus() : "N/A");
+                row.createCell(4).setCellValue(candidate.getStatus() != null ? candidate.getStatus().toString() : "N/A");
             }
 
             ByteArrayOutputStream out = new ByteArrayOutputStream();

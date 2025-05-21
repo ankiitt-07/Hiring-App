@@ -11,11 +11,10 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @EnableJpaAuditing
 @Mapper(componentModel = "spring")
 public interface CandidateMapper {
-
-//    @Mapping(target = "status", expression = "java(CandidateStatus.valueOf(dto.getStatus()))")
+    @Mapping(source = "status", target = "status", qualifiedByName = "mapStatusToEnum")
     Candidate toEntity(CandidateDTO dto);
 
-//    @Mapping(source = "status", target = "status", qualifiedByName = "mapStatusToString")
+    @Mapping(source = "status", target = "status", qualifiedByName = "mapStatusToString")
     CandidateDTO toDto(Candidate candidate);
 
     @Named("mapStatusToEnum")
@@ -28,6 +27,23 @@ public interface CandidateMapper {
         return status == null ? null : status.name();
     }
 }
+
+////    @Mapping(target = "status", expression = "java(CandidateStatus.valueOf(dto.getStatus()))")
+//    Candidate toEntity(CandidateDTO dto);
+//
+////    @Mapping(source = "status", target = "status", qualifiedByName = "mapStatusToString")
+//    CandidateDTO toDto(Candidate candidate);
+//
+//    @Named("mapStatusToEnum")
+//    default CandidateStatus mapStatusToEnum(String status) {
+//        return status == null ? null : CandidateStatus.valueOf(status);
+//    }
+//
+//    @Named("mapStatusToString")
+//    default String mapStatusToString(CandidateStatus status) {
+//        return status == null ? null : status.name();
+//    }
+//}
 
 //@Component
 //public class CandidateMapper{
