@@ -1,6 +1,5 @@
 package com.hiringapp.repository;
 
-
 import com.hiringapp.model.entity.Document;
 import org.springframework.data.jpa.repository.JpaRepository;
 

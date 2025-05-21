@@ -1,12 +1,11 @@
 package com.hiringapp.service;
 
-import com.hiringapp.exceptions.ResourceNotFoundException;
 import com.hiringapp.model.entity.Candidate;
 import com.hiringapp.model.entity.Document;
 import com.hiringapp.repository.CandidateRepository;
 import com.hiringapp.repository.DocumentRepository;
-import com.hiringapp.utils.dtos.DocumentDTO;
-import com.hiringapp.utils.mapper.DocumentMapper;
+import com.hiringapp.model.dtos.DocumentDTO;
+import com.hiringapp.model.mapper.DocumentMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -23,6 +22,7 @@ import java.util.List;
 @Service
 @Slf4j
 public class DocumentService {
+
     @Autowired
     private DocumentRepository documentRepository;
 

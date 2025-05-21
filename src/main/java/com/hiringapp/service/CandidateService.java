@@ -1,27 +1,30 @@
 package com.hiringapp.service;
 
+import com.hiringapp.model.entity.Candidate;
+import com.hiringapp.model.enums.CandidateStatus;
 import com.hiringapp.exceptions.CandidateNotFoundException;
 import com.hiringapp.exceptions.InvalidStatusTransitionException;
 import com.hiringapp.exceptions.ResourceNotFoundException;
-import com.hiringapp.model.entity.Candidate;
-import com.hiringapp.model.enums.CandidateStatus;
 import com.hiringapp.repository.CandidateRepository;
-import com.hiringapp.utils.mapper.CandidateMapper;
+import com.hiringapp.model.mapper.CandidateMapper;
+import com.hiringapp.service.producer.DocumentProducer;
+import com.hiringapp.service.producer.RabbitProducer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.CacheEvict;
 
 import java.io.ByteArrayOutputStream;
 import java.util.List;
@@ -30,7 +33,6 @@ import java.util.Optional;
 @Service
 @Slf4j
 public class CandidateService {
-
 
     @Autowired
     private CandidateRepository candidateRepository;

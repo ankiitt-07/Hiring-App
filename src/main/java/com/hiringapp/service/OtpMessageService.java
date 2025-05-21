@@ -1,6 +1,6 @@
 package com.hiringapp.service;
 
-import com.hiringapp.utils.authDto.OtpMessage;
+import com.hiringapp.model.authDto.OtpMessage;
 import org.springframework.stereotype.Service;
 
 @Service

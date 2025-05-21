@@ -1,6 +1,6 @@
 package com.hiringapp.controller;
 
-import com.hiringapp.utils.dtos.BankInfoDTO;
+import com.hiringapp.model.dtos.BankInfoDTO;
 import com.hiringapp.service.BankInfoService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;

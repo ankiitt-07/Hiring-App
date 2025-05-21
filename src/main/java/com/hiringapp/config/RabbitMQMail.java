@@ -1,8 +1,6 @@
 package com.hiringapp.config;
 
-import com.rabbitmq.client.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.amqp.support.converter.DefaultJackson2JavaTypeMapper;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
@@ -31,7 +29,7 @@ public class RabbitMQMail {
         return BindingBuilder.bind(queue()).to(exchange()).with(ROUTING_KEY);
     }
 
-    // for document
+   // for document
     public static final String DOCUMENT_QUEUE = "document.queue";
     public static final String DOCUMENT_EXCHANGE = "document.exchange";
     public static final String DOCUMENT_ROUTING_KEY = "document.routingKey";
@@ -54,12 +52,6 @@ public class RabbitMQMail {
                 .with(DOCUMENT_ROUTING_KEY);
     }
 
-    // to format in rabbitmq readable format
-    @Bean
-    public MessageConverter jsonMessageConverter() {
-        return new Jackson2JsonMessageConverter();
-    }
-
     @Bean
     public Queue otpQueue() {
         return new Queue("hiringAuthOtpQueue", true);
@@ -78,6 +70,12 @@ public class RabbitMQMail {
                 .with("auth.*");
     }
 
+    // for deserialization  so rabbit mq can process it
+    @Bean
+    public MessageConverter jsonMessageConverter() {
+        return new Jackson2JsonMessageConverter();
+    }
+
     @Bean
     public AmqpTemplate amqpTemplate(org.springframework.amqp.rabbit.connection.ConnectionFactory connectionFactory) {
         RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
@@ -85,3 +83,5 @@ public class RabbitMQMail {
         return rabbitTemplate;
     }
 }
+
+

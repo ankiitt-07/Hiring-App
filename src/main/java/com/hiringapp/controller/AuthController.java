@@ -1,12 +1,16 @@
 package com.hiringapp.controller;
 
+
+import com.hiringapp.model.authDto.*;
 import com.hiringapp.service.AuthService;
-import com.hiringapp.utils.authDto.*;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
@@ -37,12 +41,12 @@ public class AuthController {
     }
 
     @PostMapping("/forgot-password")
-    public ResponseEntity<String> forgotPassword(@RequestBody @Valid final ForgotPasswordRequest forgotPasswordReq) {
-        return new ResponseEntity<>(authService.forgetPassword(forgotPasswordReq), HttpStatus.OK);
+    public ResponseEntity<String> forgotPassword(@RequestBody @Valid final ForgotPasswordRequest forgotPasswordRequest) {
+        return new ResponseEntity<>(authService.forgetPassword(forgotPasswordRequest), HttpStatus.OK);
     }
 
     @PostMapping("/reset-password")
-    public ResponseEntity<Boolean> resetPassword(@RequestBody @Valid final ResetPasswordRequest resetPasswordReq) {
-        return new ResponseEntity<>(authService.resetPassword(resetPasswordReq), HttpStatus.OK);
+    public ResponseEntity<Boolean> resetPassword(@RequestBody @Valid final ResetPasswordRequest resetPasswordRequest) {
+        return new ResponseEntity<>(authService.resetPassword(resetPasswordRequest), HttpStatus.OK);
     }
 }

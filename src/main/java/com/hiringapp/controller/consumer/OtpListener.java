@@ -1,7 +1,7 @@
 package com.hiringapp.controller.consumer;
 
+import com.hiringapp.model.authDto.OtpMessage;
 import com.hiringapp.service.OtpMessageService;
-import com.hiringapp.utils.authDto.OtpMessage;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 

@@ -1,8 +1,7 @@
 package com.hiringapp.controller;
 
-import com.hiringapp.model.entity.EducationalInfo;
 import com.hiringapp.service.EducationalInfoService;
-import com.hiringapp.utils.dtos.EducationalInfoDTO;
+import com.hiringapp.model.dtos.EducationalInfoDTO;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

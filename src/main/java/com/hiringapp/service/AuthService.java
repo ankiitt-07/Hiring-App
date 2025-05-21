@@ -1,12 +1,13 @@
 package com.hiringapp.service;
 
+import com.hiringapp.model.authDto.*;
+import com.hiringapp.model.authEntity.User;
+import com.hiringapp.model.authMapper.UserMapper;
 import com.hiringapp.exceptions.LoginException;
 import com.hiringapp.exceptions.RegisterException;
 import com.hiringapp.jwt.JwtUtil;
-import com.hiringapp.model.authEntity.User;
 import com.hiringapp.repository.UserDetailsRepository;
-import com.hiringapp.utils.authDto.*;
-import com.hiringapp.utils.mapper.authmapper.UserMapper;
+import com.hiringapp.service.producer.OtpProducerService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -85,7 +86,7 @@ public class AuthService {
                     .orElseThrow(() -> new RuntimeException("User with email " + email + " not found"));
 
             otpService.deleteOtp(email);
-            return new VerifyOtpResponse(true, jwtUtil.generateToken(String.valueOf(user)));
+            return new VerifyOtpResponse(true, jwtUtil.generateToken(user));
         }
         return new VerifyOtpResponse(false, null);
     }

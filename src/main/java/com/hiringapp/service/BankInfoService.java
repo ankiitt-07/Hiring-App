@@ -1,12 +1,13 @@
 package com.hiringapp.service;
 
-import com.hiringapp.exceptions.ResourceNotFoundException;
+
+import com.hiringapp.model.dtos.BankInfoDTO;
 import com.hiringapp.model.entity.BankInfo;
 import com.hiringapp.model.entity.Candidate;
+import com.hiringapp.exceptions.ResourceNotFoundException;
+import com.hiringapp.model.mapper.BankInfoMapper;
 import com.hiringapp.repository.BankInfoRepository;
 import com.hiringapp.repository.CandidateRepository;
-import com.hiringapp.utils.dtos.BankInfoDTO;
-import com.hiringapp.utils.mapper.BankInfoMapper;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -39,3 +40,4 @@ public class BankInfoService {
         return bankInfoMapper.toDTO(info);
     }
 }
+

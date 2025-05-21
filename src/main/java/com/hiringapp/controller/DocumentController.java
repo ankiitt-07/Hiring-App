@@ -1,14 +1,9 @@
 package com.hiringapp.controller;
 
-
-import com.hiringapp.model.entity.Document;
-import com.hiringapp.repository.DocumentRepository;
 import com.hiringapp.service.DocumentService;
-import com.hiringapp.utils.dtos.DocumentDTO;
+import com.hiringapp.model.dtos.DocumentDTO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,9 +16,6 @@ public class DocumentController {
 
     @Autowired
     private DocumentService documentService;
-
-    @Autowired
-    private DocumentRepository documentRepository;
 
     @PostMapping("/upload-multiple")
     public ResponseEntity<?> uploadMultipleDocuments(
@@ -48,4 +40,5 @@ public class DocumentController {
     public ResponseEntity<Boolean> checkDocument(@PathVariable Long candidateId) {
         return new ResponseEntity<>(documentService.checkIfAnyDocumentExists(candidateId), HttpStatus.OK);
     }
+
 }

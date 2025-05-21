@@ -1,32 +1,65 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>Candidate Status Update!!</title>
+    <title>Status Update</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            padding: 30px;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background-color: #fff;
+            padding: 25px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #2c3e50;
+        }
+        .status-message {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .offered {
+            background-color: #e8f5e9;
+            border-left: 6px solid #4caf50;
+            color: #2e7d32;
+        }
+        .rejected {
+            background-color: #ffebee;
+            border-left: 6px solid #f44336;
+            color: #c62828;
+        }
+        .footer {
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #555;
+        }
+    </style>
 </head>
-<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; margin: 0;">
-<div style="max-width: 600px; background-color: #ffffff; padding: 30px; margin: auto; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
-    <h2 style="color: #333333;">Hello, <span th:text="${name}">Candidate</span> 👋</h2>
+<body>
+<div class="container">
+    <h2>Hello, <span th:text="${name}">Candidate</span>!</h2>
 
-    <p th:if="${status == 'OFFERED'}" style="font-size: 16px; color: #28a745;">
-        🎉 Congratulations! You have received an <strong>offer</strong> from our company. We're excited to have you on board!
-    </p>
+    <div class="status-message offered" th:if="${status == 'OFFERED'}">
+        <p>🎉 <strong>Congratulations!</strong> You have been selected and will be receiving an official offer letter soon.</p>
+        <p>Please check your email for further instructions on the next steps in the onboarding process.</p>
+    </div>
 
-    <p th:if="${status == 'REJECTED'}" style="font-size: 16px; color: #dc3545;">
-        😞 We regret to inform you that you have not been selected at this time. We truly appreciate the effort and interest you showed.
-    </p>
+    <div class="status-message rejected" th:if="${status == 'REJECTED'}">
+        <p>😞 <strong>Thank you for applying.</strong> We appreciate the effort you put into your application.</p>
+        <p>Although you were not selected this time, we encourage you to apply for future openings.</p>
+    </div>
 
-    <p style="font-size: 15px; color: #555555;">
-        Thank you once again for your time and interest in our organization. We wish you all the best in your future endeavors.
-    </p>
-
-    <hr style="margin: 30px 0; border: none; border-top: 1px solid #eeeeee;">
-
-    <p style="font-size: 14px; color: #999999;">
-        Regards,<br>
-        <strong>The Talent Acquisition Team</strong><br>
-        <span style="font-size: 13px;">Cognizant Technology Solutions</span>
-    </p>
+    <div class="footer">
+        <p>Thank you for your time and interest in our organization.</p>
+        <p>Best wishes, <br><strong>The HR Team</strong></p>
+    </div>
 </div>
 </body>
 </html>

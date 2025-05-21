@@ -1,12 +1,12 @@
 package com.hiringapp.service;
 
-import com.hiringapp.exceptions.ResourceNotFoundException;
 import com.hiringapp.model.entity.Candidate;
 import com.hiringapp.model.entity.EducationalInfo;
+import com.hiringapp.exceptions.ResourceNotFoundException;
 import com.hiringapp.repository.CandidateRepository;
 import com.hiringapp.repository.EducationalInfoRepository;
-import com.hiringapp.utils.dtos.EducationalInfoDTO;
-import com.hiringapp.utils.mapper.EducationalInfoMapper;
+import com.hiringapp.model.dtos.EducationalInfoDTO;
+import com.hiringapp.model.mapper.EducationalInfoMapper;
 import org.springframework.stereotype.Service;
 
 @Service

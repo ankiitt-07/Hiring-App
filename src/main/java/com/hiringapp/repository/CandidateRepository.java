@@ -7,6 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface CandidateRepository extends JpaRepository<Candidate, Long> {
-    @Query("SELECT DISTINCT c FROM Candidate c ORDER BY c.fullName ASC ")
+    @Query("SELECT DISTINCT c FROM Candidate c ORDER BY c.fullName ASC")
     List<Candidate> findAllCandidates();
 }
