@@ -12,6 +12,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Data
@@ -54,4 +55,12 @@ public class Candidate implements Serializable {
     public void prePersist() {
         this.sentAt = LocalDateTime.now();
     }
+
+    @OneToOne(mappedBy = "candidate", cascade = CascadeType.ALL)
+    private BankInfo bankInfo;
+
+
+//    @OneToMany(mappedBy = "candidate", cascade = CascadeType.REMOVE, orphanRemoval = true)
+//    private List<Document> documents;
+
 }

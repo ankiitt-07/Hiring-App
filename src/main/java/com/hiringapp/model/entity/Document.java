@@ -25,6 +25,7 @@ public class Document {
     private byte[] fileData;
 
     @ManyToOne
-    @JoinColumn(name = "candidate_id", nullable = false)
+    @JoinColumn(name = "candidate_id", nullable=false)
     private Candidate candidate;
+
 }

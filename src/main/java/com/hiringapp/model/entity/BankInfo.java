@@ -3,16 +3,20 @@ package com.hiringapp.model.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serializable;
+
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class BankInfo {
+//public class BankInfo implements Serializable {
 
+public class BankInfo{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
 
     private String accountHolderName;
     private String accountNumber;

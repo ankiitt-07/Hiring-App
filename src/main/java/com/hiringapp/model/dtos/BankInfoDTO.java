@@ -23,6 +23,7 @@ public class BankInfoDTO {
     @NotBlank(message = "Branch name is required")
     private String branchName;
 
+
     @NotNull(message = "Candidate ID is required")
     private Long candidateId;
 }

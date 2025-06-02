@@ -1,5 +1,8 @@
 package com.hiringapp.model.dtos;
 
+import com.hiringapp.model.entity.BankInfo;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,5 +23,7 @@ public class CandidateDTO implements Serializable {
     private LocalDateTime sentAt;
     private LocalDateTime createdDate;
     private LocalDateTime lastModifiedDate;
+
+    private BankInfo bankInfo;
 }
 

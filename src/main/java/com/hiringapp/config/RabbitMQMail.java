@@ -1,6 +1,7 @@
 package com.hiringapp.config;
 
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.support.converter.DefaultJackson2JavaTypeMapper;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
@@ -29,7 +30,7 @@ public class RabbitMQMail {
         return BindingBuilder.bind(queue()).to(exchange()).with(ROUTING_KEY);
     }
 
-   // for document
+    // for document
     public static final String DOCUMENT_QUEUE = "document.queue";
     public static final String DOCUMENT_EXCHANGE = "document.exchange";
     public static final String DOCUMENT_ROUTING_KEY = "document.routingKey";
@@ -73,7 +74,15 @@ public class RabbitMQMail {
     // for deserialization  so rabbit mq can process it
     @Bean
     public MessageConverter jsonMessageConverter() {
-        return new Jackson2JsonMessageConverter();
+//        return new Jackson2JsonMessageConverter();
+
+        Jackson2JsonMessageConverter converter = new Jackson2JsonMessageConverter();
+
+        DefaultJackson2JavaTypeMapper typeMapper = new DefaultJackson2JavaTypeMapper();
+        typeMapper.setTrustedPackages("com.hiringapp","java.util");
+
+        converter.setJavaTypeMapper(typeMapper);
+        return converter;
     }
 
     @Bean

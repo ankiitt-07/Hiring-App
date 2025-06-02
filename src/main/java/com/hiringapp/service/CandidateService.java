@@ -1,12 +1,14 @@
 package com.hiringapp.service;
 
 import com.hiringapp.model.entity.Candidate;
+import com.hiringapp.model.entity.Document;
 import com.hiringapp.model.enums.CandidateStatus;
 import com.hiringapp.exceptions.CandidateNotFoundException;
 import com.hiringapp.exceptions.InvalidStatusTransitionException;
 import com.hiringapp.exceptions.ResourceNotFoundException;
 import com.hiringapp.repository.CandidateRepository;
 import com.hiringapp.model.mapper.CandidateMapper;
+import com.hiringapp.repository.DocumentRepository;
 import com.hiringapp.service.producer.DocumentProducer;
 import com.hiringapp.service.producer.RabbitProducer;
 import lombok.extern.slf4j.Slf4j;
@@ -42,6 +44,9 @@ public class CandidateService {
 
     @Autowired
     private RabbitProducer rabbitProducer;
+
+    @Autowired
+    private DocumentRepository documentRepository;
 
     @Autowired
     private CandidateMapper candidateMapper;
@@ -117,6 +122,17 @@ public class CandidateService {
         if (!candidateRepository.existsById(id)) {
             throw new Exception("Candidate not found");
         }
+
+        // Delete documents related to the candidate
+        List<Document> documents = documentRepository.findByCandidateId(id);
+        if (!documents.isEmpty()) {
+
+
+
+            documentRepository.deleteAll(documents);
+        }
+
+        // Now delete the candidate
         candidateRepository.deleteById(id);
     }
 
